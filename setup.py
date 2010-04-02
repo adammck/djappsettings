@@ -13,6 +13,6 @@ setup(
     author="Adam Mckaig",
     author_email="adam.mckaig@gmail.com",
 
-    description="Allow reusable Django apps to provide settings",
+    description="Allow Django apps to provide default settings",
     url="http://github.com/adammck/django-app-settings",
     packages=["djangoappsettings"])
