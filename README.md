@@ -9,7 +9,7 @@ Django App Settings
 
 * It doesn't touch your project's settings module, and existing Django apps are free to ignore it. Your app can even fall back to the usual method if this module isn't available.
 
-* App settings are prevented from clobbering [built-in settings](1). They can only *add* settings.
+* App settings are prevented from clobbering [built-in settings](http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py). They can only *add* settings.
 
 * Project settings (in DJANGO_SETTINGS_MODULE) override app settings.
 
@@ -19,11 +19,11 @@ Django App Settings
 But, but
 --------
 
-* I'm aware of [Jared Forsyth](2)'s [django-appsettings](3), and I think it's lovely but wrong. Project settings should not be editable in the Django admin.
+* I'm aware of [Jared Forsyth](http://github.com/jabapyth)'s [django-appsettings](http://github.com/jabapyth/django-appsettings), and I think it's lovely but wrong. Project settings should not be editable in the Django admin.
 
 * I'm also aware that this feature has been rejected numerous times on the Django trac. But pasting a bunch of junk into my settings.py each time I add an app is a pain in the ass.
 
-* I saw [this snippet](4). It's insufficient.
+* I saw [this snippet](http://www.djangosnippets.org/snippets/573/). It's insufficient.
 
 * Checking for a setting (via settings.hasattr), and falling back to a hard-coded default value is a terrible solution, because your defaults are duplicated and buried. They should be easily discoverable.
 
@@ -63,14 +63,7 @@ Installation
 Bugs!
 -----
 
-This was created to scratch an itch for the [RapidSMS](5) project. I hope it will be useful to others, but it doesn't have any docs or tests yet, and hasn't been field tested. There are almost certainly bugs. Use it at your own risk. (But do use it, because it's *way* better.)
+This was created to scratch an itch for the [RapidSMS](http://rapidsms.org) project. I hope it will be useful to others, but it doesn't have any docs or tests yet, and hasn't been field tested. There are almost certainly bugs. Use it at your own risk. (But do use it, because it's *way* better.)
 
 Patches and pull requests are very welcome.
-Please file bugs on [GitHub](6).
-
-[1] http://code.djangoproject.com/browser/django/trunk/django/conf/global_settings.py
-[2] http://github.com/jabapyth
-[3] http://github.com/jabapyth/django-appsettings
-[4] http://www.djangosnippets.org/snippets/573/
-[5] http://rapidsms.org
-[6] http://github.com/adammck/django-app-settings/issues
+Please file bugs on [GitHub](http://github.com/adammck/django-app-settings/issues).
