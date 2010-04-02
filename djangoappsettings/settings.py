@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+# vim: et ts=4 sw=4
+
+
+import sys
+from django.conf import settings as project_settings
+from django.conf import global_settings
+from django.utils import importlib
+
+
+class DjangoAppSettings(object):
+    def __init__(self):
+        self._modules = None
+
+    def _import(self, module_name, package=None):
+        try:
+            return importlib.import_module(
+                module_name, package)
+
+        except ImportError:
+
+            # extract a backtrace, to find out where the exception was
+            # raised from. if there is a NEXT frame, it means that the
+            # import statement succeeded, but an ImportError was raised
+            # from *within* the imported module. (exc_info()[2] points
+            # here, and .tb_next points to the import_module function,
+            # so we must skip them both.) we should allow these errors
+            # to bubble, to avoid silently masking them.
+            traceback = sys.exc_info()[2]
+            if traceback.tb_next.tb_next:
+                raise
+
+            # the exception was raised from this scope. *module_name*
+            # couldn't be imported, which is fine, since allowing that
+            # is the purpose of this method.
+            return None
+
+    def _setup(self):
+        self._modules = []
+
+        for module_name in project_settings.INSTALLED_APPS:
+            settings_module_name = "%s.settings" % module_name
+            module = self._import(settings_module_name)
+            if module is None: continue
+
+            # check that the app settings module doesn't contain any of
+            # the settings already defined by django in global_settings.
+            for setting_name in dir(module):
+                if setting_name != setting_name.upper():
+                    continue
+
+                if hasattr(global_settings, setting_name):
+                    raise ValueError("The '%s' module masks the built-in '%s' setting." %
+                        (settings_module_name, setting_name))
+
+            # check that none of the settings have already been defined
+            # by another app. rather than behave ambiguously (depending
+            # on which app was listed first in INSTALLED_APPS), explode.
+            for setting_name in dir(module):
+                if setting_name != setting_name.upper():
+                    continue
+
+                # ignore settings which are defined in the project's
+                # settings module, to give project authors a workaround
+                # for bad apps which don't PREFIX_ their settings.
+                if hasattr(project_settings, setting_name):
+                    continue
+
+                for other_module in self._modules:
+                    if hasattr(other_module, setting_name):
+                        raise ValueError(
+                            "The '%s' setting is already defined by the '%s' module." %
+                            (setting_name, other_module))
+
+            # all is well
+            self._modules.append(module)
+
+    def __getattr__(self, setting_name):
+        if self._modules is None:
+            self._setup()
+
+        # try the project settings first (which also checks the global
+        # default settings, which apps are NOT allowed to override).
+        if hasattr(project_settings, setting_name):
+            return getattr(project_settings, setting_name)
+
+        # then try the app default settings.
+        for module in self._modules:
+            if hasattr(module, setting_name):
+                return getattr(module, setting_name)
+
+        raise ValueError("The '%s' setting is not defined." %
+            setting_name)
