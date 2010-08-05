@@ -8,7 +8,7 @@ from django.conf import global_settings
 from django.utils import importlib
 
 
-class DjangoAppSettings(object):
+class DjAppSettings(object):
     def __init__(self):
         self._modules = None
 
