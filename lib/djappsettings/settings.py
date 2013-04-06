@@ -9,12 +9,6 @@ from django.conf import global_settings
 from django.utils import importlib
 
 
-###########
-# LOGGING #
-###########
-
-logging.basicConfig(level=logging.DEBUG,
-    format='%(asctime)s %(levelname)s %(message)s',)
 logger = logging.getLogger(__name__)
 
 
