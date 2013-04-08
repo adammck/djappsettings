@@ -3,14 +3,22 @@
 
 
 import sys
+import logging
 from django.conf import settings as project_settings
 from django.conf import global_settings
 from django.utils import importlib
 
 
+logger = logging.getLogger(__name__)
+
+
 class DjAppSettings(object):
     def __init__(self):
         self._modules = None
+        try:
+            self._strict = project_settings.DJAPPSETTINGS_STRICT
+        except:
+            self._strict = True
 
     def _import(self, module_name, package=None):
         try:
@@ -45,17 +53,23 @@ class DjAppSettings(object):
 
             # check that the app settings module doesn't contain any of
             # the settings already defined by django in global_settings.
+            # Log this potentially ambiguous condition as an ERROR
             for setting_name in dir(module):
                 if setting_name != setting_name.upper():
                     continue
 
                 if hasattr(global_settings, setting_name):
-                    raise ValueError("The '%s' module masks the built-in '%s' setting." %
-                        (settings_module_name, setting_name))
+                    error_message = "The '%s' module masks the built-in '%s' setting." % (settings_module_name, setting_name)
+
+                    if self._strict:
+                        raise ValueError(error_message)
+                    else:
+                        logger.warning(error_message)
 
             # check that none of the settings have already been defined
             # by another app. rather than behave ambiguously (depending
-            # on which app was listed first in INSTALLED_APPS), explode.
+            # on which app was listed first in INSTALLED_APPS), <strike>explode</strike>...
+            # Log this potentially ambiguous condition as an ERROR
             for setting_name in dir(module):
                 if setting_name != setting_name.upper():
                     continue
@@ -68,9 +82,12 @@ class DjAppSettings(object):
 
                 for other_module in self._modules:
                     if hasattr(other_module, setting_name):
-                        raise ValueError(
-                            "The '%s' setting is already defined by the '%s' module." %
-                            (setting_name, other_module))
+                        error_message = "The '%s' setting is already defined by the '%s' module." % (setting_name, other_module)
+
+                        if self._strict:
+                            raise ValueError(error_message)
+                        else:
+                            logger.warning(error_message)
 
             # all is well
             self._modules.append(module)
@@ -91,3 +108,4 @@ class DjAppSettings(object):
 
         raise ValueError("The '%s' setting is not defined." %
             setting_name)
+
