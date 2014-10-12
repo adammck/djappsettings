@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name="djappsettings",
-    version="0.1.0",
+    version="0.2.0",
     license="BSD",
 
     author="Adam Mckaig",
