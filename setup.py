@@ -2,12 +2,12 @@
 # vim: et ts=4 sw=4
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
     name="djappsettings",
-    version="0.2.0",
+    version="0.2.1",
     license="BSD",
 
     author="Adam Mckaig",
@@ -15,4 +15,4 @@ setup(
 
     description="Per-app default settings for Django",
     url="http://github.com/adammck/djappsettings",
-    packages=["lib/djappsettings"])
+    packages=find_packages())
