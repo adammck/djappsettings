@@ -49,7 +49,8 @@ class DjAppSettings(object):
         for module_name in project_settings.INSTALLED_APPS:
             settings_module_name = "%s.settings" % module_name
             module = self._import(settings_module_name)
-            if module is None: continue
+            if module is None:
+                continue
 
             # check that the app settings module doesn't contain any of
             # the settings already defined by django in global_settings.
@@ -59,7 +60,8 @@ class DjAppSettings(object):
                     continue
 
                 if hasattr(global_settings, setting_name):
-                    error_message = "The '%s' module masks the built-in '%s' setting." % (settings_module_name, setting_name)
+                    error_message = "The '%s' module masks the built-in '%s' setting." % (
+                        settings_module_name, setting_name)
 
                     if self._strict:
                         raise ValueError(error_message)
@@ -82,7 +84,8 @@ class DjAppSettings(object):
 
                 for other_module in self._modules:
                     if hasattr(other_module, setting_name):
-                        error_message = "The '%s' setting is already defined by the '%s' module." % (setting_name, other_module)
+                        error_message = "The '%s' setting is already defined by the '%s' module." % (
+                            setting_name, other_module)
 
                         if self._strict:
                             raise ValueError(error_message)
@@ -107,5 +110,4 @@ class DjAppSettings(object):
                 return getattr(module, setting_name)
 
         raise ValueError("The '%s' setting is not defined." %
-            setting_name)
-
+                         setting_name)
