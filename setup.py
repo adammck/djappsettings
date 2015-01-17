@@ -15,4 +15,6 @@ setup(
 
     description="Per-app default settings for Django",
     url="http://github.com/adammck/djappsettings",
-    packages=find_packages())
+    packages=find_packages(),
+    test_suite='tests',
+)
