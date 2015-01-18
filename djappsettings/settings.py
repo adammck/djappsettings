@@ -2,8 +2,10 @@
 # vim: et ts=4 sw=4
 
 
-import sys
 import logging
+import sys
+import traceback
+
 from django.conf import settings as project_settings
 from django.conf import global_settings
 from django.utils import importlib
@@ -27,15 +29,16 @@ class DjAppSettings(object):
 
         except ImportError:
 
-            # extract a backtrace, to find out where the exception was
-            # raised from. if there is a NEXT frame, it means that the
-            # import statement succeeded, but an ImportError was raised
-            # from *within* the imported module. (exc_info()[2] points
-            # here, and .tb_next points to the import_module function,
-            # so we must skip them both.) we should allow these errors
-            # to bubble, to avoid silently masking them.
-            traceback = sys.exc_info()[2]
-            if traceback.tb_next.tb_next:
+            # Python 2 tracebacks look different thant Python 3 ones.
+            # If there are more than 2 tracebacks with code (traceback[3]),
+            # then the ImportError was caused within an existing settings.py
+            # that we were trying to import. Raise that error.
+            # If there are less than 2 tracebacks with code (traceback[3]),
+            # then the ImportError was caused by a missing settings.py file
+            # in a module we were checking, which is OK. Don't raise that error.
+            tb = sys.exc_info()[2]
+            traceback_lines = [t for t in traceback.extract_tb(tb) if t[3]]
+            if len(traceback_lines) > 2:
                 raise
 
             # the exception was raised from this scope. *module_name*
@@ -64,7 +67,7 @@ class DjAppSettings(object):
                         settings_module_name, setting_name)
 
                     if self._strict:
-                        raise ValueError(error_message)
+                        raise AttributeError(error_message)
                     else:
                         logger.warning(error_message)
 
@@ -88,7 +91,7 @@ class DjAppSettings(object):
                             setting_name, other_module)
 
                         if self._strict:
-                            raise ValueError(error_message)
+                            raise AttributeError(error_message)
                         else:
                             logger.warning(error_message)
 
@@ -109,5 +112,4 @@ class DjAppSettings(object):
             if hasattr(module, setting_name):
                 return getattr(module, setting_name)
 
-        raise ValueError("The '%s' setting is not defined." %
-                         setting_name)
+        raise AttributeError("The '%s' setting is not defined." % setting_name)

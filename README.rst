@@ -68,10 +68,21 @@ Via GitHub::
     $ python djangoappsettings/setup.py install
 
 
+Testing
+=======
+
+Install tox and run the tests::
+
+    $ git clone git://github.com/adammck/djappsettings.git
+    $ pip install tox
+    $ cd djappsettings
+    $ tox
+
+
 Bugs?
 =====
 
-This was created to scratch an itch for the `RapidSMS`_ project. I hope it will be useful to you, but it doesn't have any docs or tests yet, and hasn't been field tested. There are almost certainly bugs. Use it at your own risk. (But do use it, because it's *way* better.)
+This was created to scratch an itch for the `RapidSMS`_ project. I hope it will be useful to you. Use it at your own risk. (But do use it, because it's *way* better.)
 
 Patches and pull requests are very welcome.
 Please file bugs on `GitHub`_.
