@@ -5,10 +5,10 @@
 import logging
 import sys
 import traceback
+import importlib
 
 from django.conf import settings as project_settings
 from django.conf import global_settings
-from django.utils import importlib
 
 
 logger = logging.getLogger(__name__)
